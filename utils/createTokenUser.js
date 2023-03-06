@@ -4,6 +4,7 @@ const tokenUser = (user) => {
     userId: user._id,
     email: user.email,
     age: user.age,
+    role: user.role,
   };
 };
 

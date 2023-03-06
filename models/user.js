@@ -14,10 +14,40 @@ module.exports = (sequelize, DataTypes) => {
   }
   User.init(
     {
-      username: DataTypes.STRING,
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
-      age: DataTypes.INTEGER,
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          len: [3, 10],
+        },
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+        validate: {
+          isEmail: { message: "Must be a valid email address" },
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          len: [8, 21],
+        },
+      },
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          min: 18,
+        },
+      },
+      role: {
+        type: DataTypes.ENUM("admin", "user"),
+        defaultValue: "user",
+      },
     },
     {
       sequelize,
@@ -27,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
   User.addHook(
     "beforeCreate",
     (user) => (user.password = bcrypt.hashSync(user.password, 10))
+  );
+  User.addHook(
+    "beforeCreate",
+    (user) => (user.username = user.username.toLowerCase())
   );
   User.prototype.comparePassword = async function (userPassword) {
     const isMatch = await bcrypt.compare(userPassword, this.password);

@@ -21,6 +21,10 @@ module.exports = {
       age: {
         type: DataTypes.INTEGER,
       },
+      role: {
+        type: DataTypes.ENUM("admin", "user"),
+        defaultValue: "user",
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

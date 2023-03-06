@@ -4,7 +4,22 @@ const { createTokenUser, attachCookiesToResponse } = require("../utils");
 exports.registerUser = async (req, res) => {
   const { username, email, password, age } = req.body;
   try {
-    const user = await User.create({ username, email, password, age });
+    const emailAlreadyExists = await User.findOne({
+      where: { email: email },
+    });
+
+    if (emailAlreadyExists) {
+      return res
+        .status(400)
+        .json({ message: "This Email is registered to a user" });
+    }
+    //Assign the admin role to the first account
+    const firstAccountIsAdmin =
+      (await User.findAndCountAll({
+        where: { email: email },
+      })) === 0;
+    const role = firstAccountIsAdmin ? "admin" : "user";
+    const user = await User.create({ username, email, password, age, role });
     const tokenUser = createTokenUser(user);
     attachCookiesToResponse({ res, user: tokenUser });
     return res.status(201).json({ user: tokenUser });
