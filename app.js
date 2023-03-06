@@ -2,7 +2,9 @@ const express = require("express");
 const { sequelize } = require("./models");
 const app = express();
 const port = 1234;
+const bodyParser = require("body-parser");
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const userRouter = require("./routes/user");
 

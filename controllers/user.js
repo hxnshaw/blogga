@@ -13,19 +13,37 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new Error("Please enter Email and Password");
-  }
+  try {
+    if (!email || !password) {
+      throw new Error("Please enter Email and Password");
+    }
 
-  const user = await User.findOne({ where: { email } });
-  if (!user) {
-    throw new Error("User Does Not Exist");
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      throw new Error("User Does Not Exist");
+    }
+    const passwordIsCorrect = await user.comparePassword(password);
+    if (!passwordIsCorrect) {
+      throw new Error("Incorrect Password or Email");
+    }
+    return res
+      .status(200)
+      .json({ message: "Logged in successfully", data: user });
+  } catch (error) {
+    res.status(400).json(error.message);
   }
-  const passwordIsCorrect = await user.comparePassword(password);
-  if (!passwordIsCorrect) {
-    console.log(password);
-    console.log(email);
-    throw new Error("Incorrect Password or Email");
+};
+
+//Find a user with the email address cos it is unique
+exports.findSingleUser = async (req, res) => {
+  const { email: userEmail } = req.params;
+  try {
+    const user = await User.findOne({ where: { email: userEmail } });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return res.status(200).json({ data: user });
+  } catch (error) {
+    res.status(400).json(error.message);
   }
-  return res.status(200).json(user);
 };
