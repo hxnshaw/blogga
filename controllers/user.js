@@ -1,12 +1,15 @@
 const { User } = require("../models");
+const { createTokenUser, attachCookiesToResponse } = require("../utils");
 
 exports.registerUser = async (req, res) => {
   const { username, email, password, age } = req.body;
   try {
     const user = await User.create({ username, email, password, age });
-    return res.status(201).json(user);
+    const tokenUser = createTokenUser(user);
+    attachCookiesToResponse({ res, user: tokenUser });
+    return res.status(201).json({ user: tokenUser });
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json(error.message);
   }
 };
 
