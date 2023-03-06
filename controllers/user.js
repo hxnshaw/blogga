@@ -47,3 +47,15 @@ exports.findSingleUser = async (req, res) => {
     res.status(400).json(error.message);
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({});
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found." });
+    }
+    return res.status(200).json({ users: users.length, data: users });
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+};

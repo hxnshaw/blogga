@@ -4,10 +4,12 @@ const {
   registerUser,
   loginUser,
   findSingleUser,
+  getAllUsers,
 } = require("../controllers/user");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/user/:email", findSingleUser);
+router.get("/users/:email", findSingleUser);
+router.get("/users", getAllUsers);
 
 module.exports = router;
