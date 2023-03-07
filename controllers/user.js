@@ -1,9 +1,11 @@
 const { User } = require("../models");
 const { createTokenUser, attachCookiesToResponse } = require("../utils");
+const { sequelize, Op } = require("sequelize");
 
 exports.registerUser = async (req, res) => {
   const { username, email, password, age } = req.body;
   try {
+    const b = email.length === 0;
     const emailAlreadyExists = await User.findOne({
       where: { email: email },
     });
@@ -13,11 +15,9 @@ exports.registerUser = async (req, res) => {
         .status(400)
         .json({ message: "This Email is registered to a user" });
     }
-    //Assign the admin role to the first account
-    const firstAccountIsAdmin =
-      (await User.findAndCountAll({
-        where: { email: email },
-      })) === 0;
+    // Assign the admin role to the first account
+    const firstAccountIsAdmin = (await User.count({})) === 0;
+
     const role = firstAccountIsAdmin ? "admin" : "user";
     const user = await User.create({ username, email, password, age, role });
     const tokenUser = createTokenUser(user);
