@@ -1,7 +1,7 @@
 const tokenUser = (user) => {
   return {
     username: user.username,
-    userId: user._id,
+    userId: user.id,
     email: user.email,
     age: user.age,
     role: user.role,

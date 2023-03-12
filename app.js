@@ -6,7 +6,7 @@ const port = 1234;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieParser(process.env.JWT_SECRET_KEY));
 
 const userRouter = require("./routes/user");

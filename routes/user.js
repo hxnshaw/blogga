@@ -3,13 +3,17 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
-  findSingleUser,
+  getSingleUser,
   getAllUsers,
+  showMyProfile,
 } = require("../controllers/user");
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/users/:email", findSingleUser);
-router.get("/users", getAllUsers);
+const { authenticateUser } = require("../middlewares/authentication");
+
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
+router.route("/profile").get(authenticateUser, showMyProfile);
+router.route("/users/:email").get(authenticateUser, getSingleUser);
+router.route("/users").get(getAllUsers);
 
 module.exports = router;

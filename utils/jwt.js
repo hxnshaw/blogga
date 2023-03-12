@@ -7,9 +7,8 @@ const createJsonWebToken = ({ payload }) => {
   return token;
 };
 
-const isValidToken = ({ token }) => {
+const isValidToken = ({ token }) =>
   jwt.verify(token, process.env.JWT_SECRET_KEY);
-};
 
 const attachCookiesToResponse = ({ res, user }) => {
   const token = createJsonWebToken({ payload: user });
