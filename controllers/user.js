@@ -86,11 +86,35 @@ exports.showMyProfile = async (req, res) => {
     const user = await User.findOne({ where: { id: userId } });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found here" });
+      return res.status(404).json({ message: "User not found " });
     }
     const tokenUser = createTokenUser(user);
     return res.status(200).json({ profile: tokenUser });
   } catch (error) {
     res.status(400).json(error.message);
+  }
+};
+
+exports.editUserProfile = async (req, res) => {
+  const { age, username, email } = req.body;
+  try {
+    if (!age || !username || !email) {
+      res.status(400).json({ message: "Please enter valid credentials" });
+    }
+    const user = await User.findOne({ where: { id: req.user.userId } });
+    console.log(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found " });
+    }
+    user.age = age;
+    user.username = username;
+    user.email = email;
+    await user.save();
+
+    const tokenUser = createTokenUser(user);
+    attachCookiesToResponse({ res, user: tokenUser });
+    return res.status(200).json({ profile: tokenUser });
+  } catch (error) {
+    return res.status(400).json(error.message);
   }
 };
