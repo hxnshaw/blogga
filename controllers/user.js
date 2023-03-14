@@ -118,3 +118,37 @@ exports.editUserProfile = async (req, res) => {
     return res.status(400).json(error.message);
   }
 };
+
+exports.updateUserPassword = async (req, res) => {
+  const { password, newPassword } = req.body;
+  if (!password || !newPassword) {
+    res.status(400).json({ message: "Please enter valid credentials" });
+  }
+  const user = await User.findOne({ where: { id: req.user.userId } });
+  if (!user) {
+    return res.status(404).json({ message: "User not found " });
+  }
+
+  user.set({
+    password: newPassword,
+  });
+  //user.password = newPassword;
+  await user.save();
+  return res.status(200).json({ message: "New Password Saved" });
+};
+
+exports.deleteUser = async (req, res) => {
+  const userId = req.user.userId;
+  try {
+    const user = await User.findOne({ where: { id: userId } });
+    //Delete the token.
+    res.cookie("token", "DeleteUser", {
+      httpOnly: true,
+      expires: new Date(Date.now()),
+    });
+    await user.destroy();
+    return res.status(200).json({ msg: "User Deleted" });
+  } catch (error) {
+    return res.status(400).json(error.message);
+  }
+};

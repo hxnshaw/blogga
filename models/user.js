@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [8, 21],
+          min: 8,
         },
       },
       age: {
@@ -54,13 +54,21 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "User",
     }
   );
+  // User.addHook(
+  //   "beforeCreate",
+  //   async (user) => (user.password = bcrypt.hashSync(user.password, 10))
+  // );
+
+  User.addHook("beforeSave", async function (user) {
+    // const user = this;
+    if (!user.changed("password")) return;
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hashSync(user.password, salt);
+  });
+
   User.addHook(
     "beforeCreate",
-    (user) => (user.password = bcrypt.hashSync(user.password, 10))
-  );
-  User.addHook(
-    "beforeCreate",
-    (user) => (user.username = user.username.toLowerCase())
+    async (user) => (user.username = user.username.toLowerCase())
   );
   User.prototype.comparePassword = async function (userPassword) {
     const isMatch = await bcrypt.compare(userPassword, this.password);
